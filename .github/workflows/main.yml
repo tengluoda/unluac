@@ -1,0 +1,30 @@
+name: Build unluac
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile
+        run: |
+          mkdir -p build
+          javac -d build -sourcepath src src/unluac/*.java
+      - name: Package jar
+        run: |
+          mkdir -p bin
+          jar -cfm bin/unluac.jar src/unluac/Manifest.mf -C build .
+          ls -lh bin/unluac.jar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: unluac-jar
+          path: bin/unluac.jar
